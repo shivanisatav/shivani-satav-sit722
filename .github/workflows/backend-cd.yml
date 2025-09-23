@@ -41,6 +41,10 @@ jobs:
       - name: Wait for product-service rollout
         run: |
           kubectl rollout status deployment/product-service-w10e1 -n staging
+      
+      - name: Wait for product-service rollout
+        run: |
+          kubectl rollout status deployment/frontend-w10e1 -n staging
 
       - name: Run simple acceptance test
         run: |
