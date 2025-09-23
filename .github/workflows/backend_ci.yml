@@ -14,6 +14,8 @@ jobs:
       # Product DB container
       product_db:
         image: postgres:15
+        ports:
+          - 5432:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -27,6 +29,8 @@ jobs:
       # Order DB container
       order_db:
         image: postgres:15
+        ports:
+          - 5433:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -40,6 +44,8 @@ jobs:
       # Customer DB container
       customer_db:
         image: postgres:15
+        ports:
+          - 5434:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres

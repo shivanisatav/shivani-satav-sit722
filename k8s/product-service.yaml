@@ -53,6 +53,12 @@ spec:
             configMapKeyRef:
               name: ecomm-config-w10e1
               key: AZURE_STORAGE_CONTAINER_NAME
+        
+        - name: AZURE_SAS_TOKEN_EXPIRY_HOURS
+          valueFrom:
+            configMapKeyRef:
+              name: ecomm-config-w10e1 # ConfigMap name matches
+              key: AZURE_SAS_TOKEN_EXPIRY_HOURS
 ---
 apiVersion: v1
 kind: Service
