@@ -38,11 +38,27 @@ spec:
             secretKeyRef:
               name: ecomm-config-w10e1
               key: POSTGRES_PASSWORD
-        - name: PRODUCT_SERVICE_URL
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: ecomm-config-w10e1
+              key: AZURE_STORAGE_ACCOUNT_NAME
+        - name: AZURE_STORAGE_ACCOUNT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ecomm-config-w10e1
+              key: AZURE_STORAGE_ACCOUNT_KEY
+        - name: AZURE_STORAGE_CONTAINER_NAME
           valueFrom:
             configMapKeyRef:
               name: ecomm-config-w10e1
-              key: PRODUCT_SERVICE_URL
+              key: AZURE_STORAGE_CONTAINER_NAME
+        
+        - name: AZURE_SAS_TOKEN_EXPIRY_HOURS
+          valueFrom:
+            configMapKeyRef:
+              name: ecomm-config-w10e1 # ConfigMap name matches
+              key: AZURE_SAS_TOKEN_EXPIRY_HOURS
 ---
 apiVersion: v1
 kind: Service
