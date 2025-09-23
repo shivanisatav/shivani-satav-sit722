@@ -76,7 +76,7 @@ jobs:
       - name: Run product_service tests
         working-directory: backend/product_service
         env:
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: product_db
           POSTGRES_PORT: 5432
           POSTGRES_DB: products
           POSTGRES_USER: postgres
@@ -86,7 +86,7 @@ jobs:
       - name: Run order_service tests
         working-directory: backend/order_service
         env:
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: order_db
           POSTGRES_PORT: 5433
           POSTGRES_DB: orders
           POSTGRES_USER: postgres
@@ -96,7 +96,7 @@ jobs:
       - name: Run customer_service tests
         working-directory: backend/customer_service
         env:
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: customer_db
           POSTGRES_PORT: 5434
           POSTGRES_DB: customer
           POSTGRES_USER: postgres
