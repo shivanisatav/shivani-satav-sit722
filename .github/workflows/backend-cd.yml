@@ -30,9 +30,24 @@ jobs:
           kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -f k8s/ --namespace=staging
 
+      - name: Wait for frontend rollout
+        run: |
+          kubectl rollout status deployment/frontend-w10e1 -n staging
+          
+      - name: Wait for customer-service rollout
+        run: |
+          kubectl rollout status deployment/customer-service-w10e1 -n staging
+
+      - name: Wait for order-service rollout
+        run: |
+          kubectl rollout status deployment/order-service-w10e1 -n staging
+
+      - name: Wait for product-service rollout
+        run: |
+          kubectl rollout status deployment/product-service-w10e1 -n staging
+
       - name: Run simple acceptance test
         run: |
-          kubectl rollout status deployment/frontend -n staging
           kubectl get svc -n staging
           echo "Acceptance test passed"
 
