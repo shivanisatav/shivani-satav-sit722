@@ -31,13 +31,13 @@ jobs:
 
       - name: Build and test Order Service
         run: |
-          cd ../order_service
+          cd backend/order_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }} .
           docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }} pytest || true
 
       - name: Build and test Product Service
         run: |
-          cd ../product_service
+          cd backend/product_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }} .
           docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }} pytest || true
 
