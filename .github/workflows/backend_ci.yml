@@ -42,7 +42,7 @@ jobs:
           - 5433:5432
 
       # Customer DB container
-      order_db:
+      customer_db:
         image: postgres:15
         env:
           POSTGRES_USER: postgres
@@ -98,7 +98,7 @@ jobs:
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5434
-          POSTGRES_DB: orders
+          POSTGRES_DB: customer
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         run: pytest tests --maxfail=1 --disable-warnings -q
