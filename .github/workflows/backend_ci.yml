@@ -27,25 +27,25 @@ jobs:
           cd backend/customer_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest .
           # run unit tests
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest pytest
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest pytest /code/tests 
 
       - name: Build and test Order Service
         run: |
           cd backend/order_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest .
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest pytest
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest pytest /code/tests
 
       - name: Build and test Product Service
         run: |
           cd backend/product_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest .
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest pytest
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest pytest /code/tests
       
       - name: Build and test Frontend 
         run: |
           cd backend/product_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/frontend:latest .
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/frontend:latest pytest
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/frontend:latest
 
       - name: Push backend images to ACR
         run: |
