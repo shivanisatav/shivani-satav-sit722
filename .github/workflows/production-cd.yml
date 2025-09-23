@@ -27,7 +27,7 @@ jobs:
       - name: Create production namespace
         run: |
           kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
-          
+
       - name: Deploy to production
         run: |
           kubectl apply -f k8s/ --namespace=production
