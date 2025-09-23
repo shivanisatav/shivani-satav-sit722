@@ -1,4 +1,3 @@
-# Trigger testing 
 name: Backend CI - Test and Push to ACR
 
 on:
@@ -25,7 +24,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       # Order DB container
       order_db:
         image: postgres:15
@@ -71,7 +70,17 @@ jobs:
           for req in backend/*/requirements.txt; do
             pip install -r "$req"
           done
-          pip install pytest httpx
+          pip install pytest httpx psycopg2-binary
+
+      # --- Product Service Tests ---
+      - name: Wait for Product DB
+        run: |
+          echo "Waiting for Product DB to be ready..."
+          for i in {1..20}; do
+            pg_isready -h product_db -p 5432 -U postgres && break
+            echo "Product DB not ready yet..."
+            sleep 3
+          done
 
       - name: Run product_service tests
         working-directory: backend/product_service
@@ -83,21 +92,41 @@ jobs:
           POSTGRES_PASSWORD: postgres
         run: pytest tests --maxfail=1 --disable-warnings -q
 
+      # --- Order Service Tests ---
+      - name: Wait for Order DB
+        run: |
+          echo "Waiting for Order DB to be ready..."
+          for i in {1..20}; do
+            pg_isready -h order_db -p 5432 -U postgres && break
+            echo "Order DB not ready yet..."
+            sleep 3
+          done
+
       - name: Run order_service tests
         working-directory: backend/order_service
         env:
           POSTGRES_HOST: order_db
-          POSTGRES_PORT: 5433
+          POSTGRES_PORT: 5432
           POSTGRES_DB: orders
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         run: pytest tests --maxfail=1 --disable-warnings -q
-      
+
+      # --- Customer Service Tests ---
+      - name: Wait for Customer DB
+        run: |
+          echo "Waiting for Customer DB to be ready..."
+          for i in {1..20}; do
+            pg_isready -h customer_db -p 5432 -U postgres && break
+            echo "Customer DB not ready yet..."
+            sleep 3
+          done
+
       - name: Run customer_service tests
         working-directory: backend/customer_service
         env:
           POSTGRES_HOST: customer_db
-          POSTGRES_PORT: 5434
+          POSTGRES_PORT: 5432
           POSTGRES_DB: customer
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -120,28 +149,23 @@ jobs:
         run: |
           az acr login --name ${{ secrets.ACR_NAME }}
 
-      - name: Build and test Product Service
+      - name: Build Product Service Docker image
+        working-directory: backend/product_service
         run: |
-          cd backend/product_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest .
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest pytest /code/tests
 
-      - name: Build and test Order Service
+      - name: Build Order Service Docker image
+        working-directory: backend/order_service
         run: |
-          cd backend/order_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest .
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest pytest /code/tests
 
-      - name: Build and test Customer Service
+      - name: Build Customer Service Docker image
+        working-directory: backend/customer_service
         run: |
-          cd backend/customer_service
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest .
-          # run unit tests
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest pytest /code/tests 
-      
+
       - name: Push backend images to ACR
         run: |
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest
-
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest
