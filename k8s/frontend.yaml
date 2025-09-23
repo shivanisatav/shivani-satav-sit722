@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-w10e1
+  name: frontend-service-w10e1
   labels:
     app: frontend
 spec:

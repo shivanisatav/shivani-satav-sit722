@@ -30,14 +30,6 @@ jobs:
           kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -f k8s/ --namespace=staging
 
-      - name: Wait for all rollouts
-        run: |
-          # Wait for all deployments to finish rollout
-          for deploy in $(kubectl get deployments -n staging -o jsonpath='{.items[*].metadata.name}'); do
-            echo "Waiting for rollout of deployment/$deploy..."
-            kubectl rollout status deployment/$deploy -n staging
-          done
-
       - name: Run simple acceptance test
         run: |
           kubectl get svc -n staging
