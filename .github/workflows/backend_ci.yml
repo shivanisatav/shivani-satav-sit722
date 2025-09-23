@@ -25,24 +25,31 @@ jobs:
       - name: Build and test Customer Service
         run: |
           cd backend/customer_service
-          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:${{ github.sha }} .
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest .
           # run unit tests
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:${{ github.sha }} pytest || true
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest pytest
 
       - name: Build and test Order Service
         run: |
           cd backend/order_service
-          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }} .
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }} pytest || true
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest .
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest pytest
 
       - name: Build and test Product Service
         run: |
           cd backend/product_service
-          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }} .
-          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }} pytest || true
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest .
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest pytest
+      
+      - name: Build and test Product Service
+        run: |
+          cd backend/product_service
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/frontend:latest .
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/frontend:latest pytest
 
       - name: Push backend images to ACR
         run: |
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:${{ github.sha }}
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }}
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }}
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:latest
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/order-service:latest
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/product-service:latest
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/frontend:latest
