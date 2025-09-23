@@ -32,8 +32,10 @@ jobs:
 
       - name: Wait for all rollouts
         run: |
-          for deploy in $(kubectl get deploy -n staging -o name); do
-            kubectl rollout status $deploy -n staging
+          # Wait for all deployments to finish rollout
+          for deploy in $(kubectl get deployments -n staging -o jsonpath='{.items[*].metadata.name}'); do
+            echo "Waiting for rollout of deployment/$deploy..."
+            kubectl rollout status deployment/$deploy -n staging
           done
 
       - name: Run simple acceptance test
