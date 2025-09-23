@@ -1,0 +1,41 @@
+name: Backend CD - Deploy to Staging
+
+on:
+  workflow_run:
+    workflows: ["Backend CI - Test and Push to ACR"]
+    types:
+      - completed
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: ${{ secrets.AKS_CLUSTER }}
+          resource-group: ${{ secrets.AKS_RG }}
+
+      - name: Deploy to staging namespace
+        run: |
+          kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f k8s/ --namespace=staging
+
+      - name: Run simple acceptance test
+        run: |
+          kubectl rollout status deployment/frontend -n staging
+          kubectl get svc -n staging
+          echo "Acceptance test passed"
+
+      - name: Destroy staging environment
+        run: |
+          kubectl delete namespace staging

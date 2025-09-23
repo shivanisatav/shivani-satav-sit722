@@ -1,0 +1,47 @@
+name: Backend CI - Test and Push to ACR
+
+on:
+  push:
+    branches:
+      - testing
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to ACR
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Build and test Customer Service
+        run: |
+          cd backend/customer_service
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:${{ github.sha }} .
+          # run unit tests
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:${{ github.sha }} pytest tests/
+
+      - name: Build and test Order Service
+        run: |
+          cd ../order_service
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }} .
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }} pytest tests/
+
+      - name: Build and test Product Service
+        run: |
+          cd ../product_service
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }} .
+          docker run --rm ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }} pytest tests/
+
+      - name: Push backend images to ACR
+        run: |
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/customer-service:${{ github.sha }}
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/order-service:${{ github.sha }}
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/product-service:${{ github.sha }}
